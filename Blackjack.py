@@ -1,8 +1,8 @@
 import random
 
-playagain = 'y'
+play_again = 'y'
 balance = 100
-roundcount = 0
+round_count = 0
 
 def create_deck():
     ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
@@ -25,7 +25,7 @@ def calculate_hand_value(hand):
         else:
             value += int(rank)
 
-    while (value > 21) and ace_count:
+    while value > 21 and ace_count:
         value -= 10
         ace_count -= 1
 
@@ -36,7 +36,7 @@ def display_hand(hand, player_name):
 
 print(f"Your balance is: €{balance}")
 
-while (playagain.lower() == 'y'):
+while play_again.lower() == 'y':
     bet = int(input("Please input your bet: "))
     deck = create_deck()
     player_hand = [deck.pop(), deck.pop()]
@@ -50,24 +50,24 @@ while (playagain.lower() == 'y'):
 
         if player_value == 21:
             print("Blackjack! You win!")
-            balance = balance + (bet*1.5)
+            balance += int(bet * 1.5)
             break
 
         elif player_value > 21:
             print("Bust! You lose!")
-            balance = balance - bet
+            balance -= bet
             break
 
         action = input("Do you want to hit or stand? ").lower()
 
-        if action == ('hit' or 'h'):
+        if action in ['hit', 'h']:
             player_hand.append(deck.pop())
 
-        elif action == ('stand' or 's'):
+        elif action in ['stand', 's']:
             break
 
-    if (player_value != 21) and (player_value < 21):
-        while (calculate_hand_value(dealer_hand) < 17):
+    if player_value != 21 and player_value < 21:
+        while calculate_hand_value(dealer_hand) < 17:
             dealer_hand.append(deck.pop())
 
         display_hand(player_hand, "Player")
@@ -76,20 +76,20 @@ while (playagain.lower() == 'y'):
         player_value = calculate_hand_value(player_hand)
         dealer_value = calculate_hand_value(dealer_hand)
 
-        if (player_value <= 21):
-            if (player_value > dealer_value) or (dealer_value > 21):
+        if player_value <= 21:
+            if player_value > dealer_value or dealer_value > 21:
                 print("You win!")
-                balance = balance + bet
+                balance += bet
 
             elif player_value < dealer_value:
                 print("Dealer wins!")
-                balance = balance - bet
+                balance -= bet
 
             else:
                 print("It's a tie!")
 
-    roundcount += 1
+    round_count += 1
     print(f"Balance: €{balance}")
-    playagain = input("Would you like to play again? (y/n): ")
+    play_again = input("Would you like to play again? (y/n): ")
 
-print(f"Thanks for playing! You played {roundcount} rounds, and your final balance was €{balance}!")
+print(f"Thanks for playing! You played {round_count} rounds, and your final balance was €{balance}!")
