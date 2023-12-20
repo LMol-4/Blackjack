@@ -1,9 +1,7 @@
 import random
 
-play_again = 'y'
-balance = 100
-round_count = 0
-
+# Functions
+#generate and shuffle
 def create_deck():
     ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
     suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
@@ -11,6 +9,7 @@ def create_deck():
     random.shuffle(deck)
     return deck
 
+#calculate hand value function
 def calculate_hand_value(hand):
     value = 0
     ace_count = 0
@@ -31,65 +30,104 @@ def calculate_hand_value(hand):
 
     return value
 
+#display hand function
 def display_hand(hand, player_name):
     print(f"{player_name}'s Hand: {', '.join([f'{card[0]} of {card[1]}' for card in hand])}")
 
-print(f"Your balance is: €{balance}")
-
-while play_again.lower() == 'y':
-    bet = int(input("Please input your bet: "))
-    deck = create_deck()
-    player_hand = [deck.pop(), deck.pop()]
-    dealer_hand = [deck.pop(), deck.pop()]
-
+#menu function
+def main_menu():
+    print("Blackjack by Luke\n\n1) Play Now\n2) Settings\n3) Stats")
     while True:
-        display_hand(player_hand, "Player")
-        display_hand([dealer_hand[0]], "Dealer")
+        user_input = input("\nPlease select an option: ")
 
-        player_value = calculate_hand_value(player_hand)
+        if user_input.isdigit() and int(user_input) in [1, 2, 3]:
+            return int(user_input)
+        else:
+            print("Invalid option. Please enter 1, 2, or 3.")
 
-        if player_value == 21:
-            print("Blackjack! You win!")
-            balance += int(bet * 1.5)
-            break
+# Variables
+player_name = "Luke"
+balance = 100
+wins = 0
+games_played = 0
 
-        elif player_value > 21:
-            print("Bust! You lose!")
-            balance -= bet
-            break
+# Logic
+while True:
+    play_again = 'y'
+    round_count = 0
+    menu_option = main_menu()
 
-        action = input("Do you want to hit or stand? ").lower()
+    if menu_option == 1:
+        print(f"Your balance is: €{balance}")
+        while play_again.lower() == 'y':
+            bet = int(input("Please input your bet: "))
+            deck = create_deck()
+            player_hand = [deck.pop(), deck.pop()]
+            dealer_hand = [deck.pop(), deck.pop()]
 
-        if action in ['hit', 'h']:
-            player_hand.append(deck.pop())
+            while True:
+                display_hand(player_hand, player_name)
+                display_hand([dealer_hand[0]], "Dealer")
 
-        elif action in ['stand', 's']:
-            break
+                player_value = calculate_hand_value(player_hand)
 
-    if player_value != 21 and player_value < 21:
-        while calculate_hand_value(dealer_hand) < 17:
-            dealer_hand.append(deck.pop())
+                if player_value == 21:
+                    print("Blackjack! You win!")
+                    balance += int(bet * 1.5)
+                    wins += 1
+                    break
 
-        display_hand(player_hand, "Player")
-        display_hand(dealer_hand, "Dealer")
+                elif player_value > 21:
+                    print("Bust! You lose!")
+                    balance -= bet
+                    break
 
-        player_value = calculate_hand_value(player_hand)
-        dealer_value = calculate_hand_value(dealer_hand)
+                action = input("Do you want to hit or stand? ").lower()
 
-        if player_value <= 21:
-            if player_value > dealer_value or dealer_value > 21:
-                print("You win!")
-                balance += bet
+                if action in ['hit', 'h']:
+                    player_hand.append(deck.pop())
 
-            elif player_value < dealer_value:
-                print("Dealer wins!")
-                balance -= bet
+                elif action in ['stand', 's']:
+                    break
 
-            else:
-                print("It's a tie!")
+            if player_value != 21 and player_value < 21:
+                while calculate_hand_value(dealer_hand) < 17:
+                    dealer_hand.append(deck.pop())
 
-    round_count += 1
-    print(f"Balance: €{balance}")
-    play_again = input("Would you like to play again? (y/n): ")
+                display_hand(player_hand, "Player")
+                display_hand(dealer_hand, "Dealer")
 
-print(f"Thanks for playing! You played {round_count} rounds, and your final balance was €{balance}!")
+                player_value = calculate_hand_value(player_hand)
+                dealer_value = calculate_hand_value(dealer_hand)
+
+                if player_value <= 21:
+                    if player_value > dealer_value or dealer_value > 21:
+                        print("You win!")
+                        balance += bet
+                        wins += 1
+
+                    elif player_value < dealer_value:
+                        print("Dealer wins!")
+                        balance -= bet
+
+                    else:
+                        print("It's a tie!")
+
+            round_count += 1
+            games_played += 1
+            print(f"Balance: €{balance}")
+
+            play_again = input("Would you like to play again? (y/n): ")
+
+            if play_again.lower() != 'y':
+                print(f"\nThanks for playing! You played {round_count} rounds, and your final balance was €{balance}!\n")
+                break
+
+    elif menu_option == 2:
+        print(f"Your current name is: {player_name}")
+        player_name = input("Please enter your new name: ")
+
+    elif menu_option == 3:
+        print(f"Wins = {wins}")
+        print(f"Games played = {games_played}")
+
