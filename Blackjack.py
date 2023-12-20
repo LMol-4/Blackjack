@@ -163,7 +163,7 @@ while quitgame == False:
             play_again = input("Would you like to play again? (y/n): ")
 
             if play_again.lower() != 'y':
-                print(f"\nThanks for playing! You played {round_count} rounds, and your final balance was €{player_data['balance']}!\n")
+                print(f"\nYou played {round_count} rounds, and your final balance was €{player_data['balance']}!\n")
                 break
 
     elif menu_option == 2:
@@ -179,3 +179,5 @@ while quitgame == False:
 
     elif menu_option == 4:
         quitgame = True
+
+print("\n\nThanks for playing!")
