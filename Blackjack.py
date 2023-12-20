@@ -38,11 +38,11 @@ def display_hand(hand, player_name):
 
 #menu function
 def main_menu():
-    print("Blackjack by Luke\n\n1) Play Now\n2) Settings\n3) Stats")
+    print("Blackjack by Luke\n\n1) Play Now\n2) Settings\n3) Stats\n4) Quit")
     while True:
         user_input = input("\nPlease select an option: ")
 
-        if user_input.isdigit() and int(user_input) in [1, 2, 3]:
+        if user_input.isdigit() and int(user_input) in [1, 2, 3, 4]:
             return int(user_input)
         else:
             print("Invalid option. Please enter 1, 2, or 3.")
@@ -66,13 +66,30 @@ def load_player_data(filename='player_data.json'):
     except FileNotFoundError:
         return None
 
+def highest_stat_checker():
+    global player_data, current_win, current_loss
+    # Check and update the stats
+    if current_win > player_data['biggest_win']:
+        player_data['biggest_win'] = current_win
+
+    if current_loss > player_data['biggest_loss']:
+        player_data['biggest_loss'] = current_loss
+
+    if player_data['balance'] > player_data['highest_balance']:
+        player_data['highest_balance'] = player_data['balance']
+
+
 #load player data
 player_data = load_player_data()
 if player_data is None:
-    player_data = {'name': 'Player', 'balance': 1000, 'wins': 0, 'games_played': 0, 'highest_balance': 0, 'biggest_win': 0}
+    player_data = {'name': 'Player', 'balance': 1000, 'wins': 0, 'games_played': 0, 'highest_balance': 0, 'biggest_win': 0, 'biggest_loss': 0}
 
+quitgame = False #used for menu option 4 to quit game
 # Logic
-while True:
+while quitgame == False:
+    #initializing variables
+    current_win = 0
+    current_loss = 0
     play_again = 'y'
     round_count = 0
     save_player_data(player_data) #save player data when you go back to the menu
@@ -96,11 +113,13 @@ while True:
                     print("Blackjack! You win!")
                     player_data['balance'] += int(bet * 1.5)
                     player_data['wins'] += 1
+                    current_win = int(bet * 1.5)
                     break
 
                 elif player_value > 21:
                     print("Bust! You lose!")
                     player_data['balance'] -= bet
+                    current_loss = bet
                     break
 
                 action = input("Do you want to hit or stand? ").lower()
@@ -126,14 +145,17 @@ while True:
                         print("You win!")
                         player_data['balance'] += bet
                         player_data['wins'] += 1
+                        current_win = bet
 
                     elif player_value < dealer_value:
                         print("Dealer wins!")
                         player_data['balance'] -= bet
+                        current_loss = bet
 
                     else:
                         print("It's a tie!")
 
+            highest_stat_checker()
             round_count += 1
             player_data['games_played'] += 1
             print(f"Balance: €{player_data['balance']}")
@@ -151,4 +173,9 @@ while True:
     elif menu_option == 3:
         print(f"Wins = {player_data['wins']}")
         print(f"Games played = {player_data['games_played']}")
+        print(f"Biggest Win = {player_data['biggest_win']}")
+        print(f"Biggest Loss = {player_data['biggest_loss']}")
+        print(f"Highest Balance = {player_data['highest_balance']}\n")
 
+    elif menu_option == 4:
+        quitgame = True
