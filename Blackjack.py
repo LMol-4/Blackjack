@@ -1,4 +1,6 @@
 import random
+import json #used to store data
+import os #used to find the current location of .py
 
 # Functions
 #generate and shuffle
@@ -45,20 +47,39 @@ def main_menu():
         else:
             print("Invalid option. Please enter 1, 2, or 3.")
 
-# Variables
-player_name = "Luke"
-balance = 100
-wins = 0
-games_played = 0
+#find location of .py function
+def get_script_directory():
+    return os.path.dirname(os.path.realpath(__file__))
+
+#save player data function
+def save_player_data(player_data, filename='player_data.json'):
+    file_path = os.path.join(get_script_directory(), filename)
+    with open(file_path, 'w') as file:
+        json.dump(player_data, file)
+
+#load player data function
+def load_player_data(filename='player_data.json'):
+    file_path = os.path.join(get_script_directory(), filename)
+    try:
+        with open(file_path, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return None
+
+#load player data
+player_data = load_player_data()
+if player_data is None:
+    player_data = {'name': 'Player', 'balance': 1000, 'wins': 0, 'games_played': 0, 'highest_balance': 0, 'biggest_win': 0}
 
 # Logic
 while True:
     play_again = 'y'
     round_count = 0
+    save_player_data(player_data) #save player data when you go back to the menu
     menu_option = main_menu()
 
     if menu_option == 1:
-        print(f"Your balance is: €{balance}")
+        print(f"Your balance is: €{player_data['balance']}")
         while play_again.lower() == 'y':
             bet = int(input("Please input your bet: "))
             deck = create_deck()
@@ -66,20 +87,20 @@ while True:
             dealer_hand = [deck.pop(), deck.pop()]
 
             while True:
-                display_hand(player_hand, player_name)
+                display_hand(player_hand, player_data['name'])
                 display_hand([dealer_hand[0]], "Dealer")
 
                 player_value = calculate_hand_value(player_hand)
 
                 if player_value == 21:
                     print("Blackjack! You win!")
-                    balance += int(bet * 1.5)
-                    wins += 1
+                    player_data['balance'] += int(bet * 1.5)
+                    player_data['wins'] += 1
                     break
 
                 elif player_value > 21:
                     print("Bust! You lose!")
-                    balance -= bet
+                    player_data['balance'] -= bet
                     break
 
                 action = input("Do you want to hit or stand? ").lower()
@@ -103,31 +124,31 @@ while True:
                 if player_value <= 21:
                     if player_value > dealer_value or dealer_value > 21:
                         print("You win!")
-                        balance += bet
-                        wins += 1
+                        player_data['balance'] += bet
+                        player_data['wins'] += 1
 
                     elif player_value < dealer_value:
                         print("Dealer wins!")
-                        balance -= bet
+                        player_data['balance'] -= bet
 
                     else:
                         print("It's a tie!")
 
             round_count += 1
-            games_played += 1
-            print(f"Balance: €{balance}")
+            player_data['games_played'] += 1
+            print(f"Balance: €{player_data['balance']}")
 
             play_again = input("Would you like to play again? (y/n): ")
 
             if play_again.lower() != 'y':
-                print(f"\nThanks for playing! You played {round_count} rounds, and your final balance was €{balance}!\n")
+                print(f"\nThanks for playing! You played {round_count} rounds, and your final balance was €{player_data['balance']}!\n")
                 break
 
     elif menu_option == 2:
-        print(f"Your current name is: {player_name}")
-        player_name = input("Please enter your new name: ")
+        print(f"Your current name is: {player_data['name']}")
+        player_data['name'] = input("Please enter your new name: ")
 
     elif menu_option == 3:
-        print(f"Wins = {wins}")
-        print(f"Games played = {games_played}")
+        print(f"Wins = {player_data['wins']}")
+        print(f"Games played = {player_data['games_played']}")
 
