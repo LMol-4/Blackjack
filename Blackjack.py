@@ -66,6 +66,7 @@ def load_player_data(filename='player_data.json'):
     except FileNotFoundError:
         return None
 
+#function to update biggest win/loss and highest balacne
 def highest_stat_checker():
     global player_data, current_win, current_loss
     # Check and update the stats
@@ -82,7 +83,7 @@ def highest_stat_checker():
 #load player data
 player_data = load_player_data()
 if player_data is None:
-    player_data = {'name': 'Player', 'balance': 1000, 'wins': 0, 'games_played': 0, 'highest_balance': 0, 'biggest_win': 0, 'biggest_loss': 0}
+    player_data = {'name': 'Player', 'balance': 1000, 'wins': 0, 'games_played': 0, 'highest_balance': 0, 'biggest_win': 0, 'biggest_loss': 0, 'times_bankrupt': 0}
 
 quitgame = False #used for menu option 4 to quit game
 # Logic
@@ -98,7 +99,16 @@ while quitgame == False:
     if menu_option == 1:
         print(f"Your balance is: €{player_data['balance']}")
         while play_again.lower() == 'y':
-            bet = int(input("Please input your bet: "))
+            while True:
+                try:
+                    bet = int(input("Enter your bet: "))
+                    if bet > player_data['balance']:
+                        print("You do not have enough money!")
+                    else:
+                        break  #exit loop if valid
+                except ValueError:
+                    print("Invalid input! Please enter a valid number.")
+
             deck = create_deck()
             player_hand = [deck.pop(), deck.pop()]
             dealer_hand = [deck.pop(), deck.pop()]
@@ -119,6 +129,7 @@ while quitgame == False:
                 elif player_value > 21:
                     print("Bust! You lose!")
                     player_data['balance'] -= bet
+                    save_player_data(player_data) #stop player cheating loses
                     current_loss = bet
                     break
 
@@ -150,6 +161,7 @@ while quitgame == False:
                     elif player_value < dealer_value:
                         print("Dealer wins!")
                         player_data['balance'] -= bet
+                        save_player_data(player_data) #stop player cheating loses
                         current_loss = bet
 
                     else:
@@ -162,6 +174,11 @@ while quitgame == False:
 
             play_again = input("Would you like to play again? (y/n): ")
 
+            if (player_data['balance'] <= 0):
+                print("You have gone bankrupt! Here is another €1000!")
+                player_data['balance'] = 1000
+                player_data['times_bankrupt'] += 1
+
             if play_again.lower() != 'y':
                 print(f"\nYou played {round_count} rounds, and your final balance was €{player_data['balance']}!\n")
                 break
@@ -172,12 +189,13 @@ while quitgame == False:
 
     elif menu_option == 3:
         print(f"Wins = {player_data['wins']}")
-        print(f"Games played = {player_data['games_played']}")
+        print(f"Games Played = {player_data['games_played']}")
         print(f"Biggest Win = {player_data['biggest_win']}")
         print(f"Biggest Loss = {player_data['biggest_loss']}")
-        print(f"Highest Balance = {player_data['highest_balance']}\n")
+        print(f"Highest Balance = {player_data['highest_balance']}")
+        print(f"Times Bankrupt = {player_data['times_bankrupt']}\n")
 
     elif menu_option == 4:
         quitgame = True
 
-print("\n\nThanks for playing!")
+print("\n\nThanks for playing!\n\n")
