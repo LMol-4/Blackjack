@@ -90,6 +90,7 @@ def highest_stat_checker():
     if player_data['balance'] > player_data['highest_balance']:
         player_data['highest_balance'] = player_data['balance']
 
+#calculate true count function
 def true_count_checker(hand):
     global num_decks_left, value
     
@@ -108,7 +109,7 @@ def true_count_checker(hand):
     else:
         return value
     
-
+#calculate decks left function
 def number_decks_left():
     global num_decks, num_decks_left, cards_played
 
@@ -154,7 +155,9 @@ while quitgame == False:
             play_deck += deck
 
         print(f"Your balance is: €{player_data['balance']}")
+
         while play_again.lower() == 'y':
+            #betting
             while True:
                 try:
                     bet = int(input("Enter your bet: "))
@@ -175,6 +178,7 @@ while quitgame == False:
 
                 player_value = calculate_hand_value(player_hand)
 
+                #blackjack
                 if player_value == 21:
                     print("Blackjack! You win!")
                     player_data['balance'] += int(bet * 1.5)
@@ -184,6 +188,7 @@ while quitgame == False:
                     display_hand(dealer_hand, "Dealer")
                     break
 
+                #bust
                 elif player_value > 21:
                     print("Bust! You lose!")
                     player_data['balance'] -= bet
@@ -193,6 +198,7 @@ while quitgame == False:
                     display_hand(dealer_hand, "Dealer")
                     break
 
+                #hit or stand
                 action = input("Do you want to hit or stand? ").lower()
 
                 if action in ['hit', 'h']:
@@ -202,6 +208,7 @@ while quitgame == False:
                 elif action in ['stand', 's']:
                     break
 
+            #loop used to calculate win or loss when you dont bust or blackjack
             if player_value != 21 and player_value < 21:
                 while calculate_hand_value(dealer_hand) < 17:
                     dealer_hand.append(play_deck.pop())
@@ -229,9 +236,10 @@ while quitgame == False:
                     else:
                         print("It's a tie!")
 
+            #update some stats
             highest_stat_checker()
 
-            #true count
+            #true count calculation
             number_decks_left()
             playedcards = player_hand + dealer_hand
             true_count = true_count_checker(playedcards)
@@ -240,31 +248,38 @@ while quitgame == False:
             player_data['games_played'] += 1
             print(f"Balance: €{player_data['balance']}")
 
+            #display true count
             if (card_count_mode %2 != 0):
                 print(f"The true count is: {true_count:.2f}")
             
+            #display debug stats
             if (debug_mode %2 != 0):
                     print(f"Value = {value}\nNumber of deck = {num_decks}\nNumber of decks left = {num_decks_left}\nCards played = {cards_played}")
 
             play_again = input("Would you like to play again? (y/n): ")
 
+            #exit game back to main menu
             if play_again.lower() != 'y':
                 print(f"\nYou played {round_count} rounds, and your final balance was €{player_data['balance']}!\n")
                 break
 
+            #add money if you run out
             if (player_data['balance'] <= 0):
                 print("You have gone bankrupt! Here is another €1000!")
                 player_data['balance'] += 1000
                 player_data['times_bankrupt'] += 1
 
+    #settings menu
     elif menu_option == 2:
         while exit_settings == False:
             settings_option = settings_menu()
 
+            #change name
             if settings_option == 1:
                 print(f"Your current name is: {player_data['name']}")
                 player_data['name'] = input("Please enter your new name: ")
         
+            #change amount of decks
             if settings_option == 2:
                 print(f"Your current number of decks is {player_data['num_decks']}")
                 while True:
@@ -276,6 +291,7 @@ while quitgame == False:
                     else:
                         print("Invalid option.")
 
+            #card count mode
             if settings_option == 3:
                 card_count_mode += 1
                 if (card_count_mode %2 == 0):
@@ -283,6 +299,7 @@ while quitgame == False:
                 if (card_count_mode %2 != 0):
                     print("Card count mode is: Enabled")
 
+            #debug mode
             if settings_option == 4:
                 debug_mode += 1
                 if (debug_mode %2 == 0):
@@ -290,9 +307,11 @@ while quitgame == False:
                 if (debug_mode %2 != 0):
                     print("Debug mode is: Enabled")
 
+            #exit settings
             if settings_option == 5:
                 exit_settings = True
 
+    #stats
     elif menu_option == 3:
         print(f"Wins = {player_data['wins']}")
         print(f"Games Played = {player_data['games_played']}")
@@ -301,6 +320,7 @@ while quitgame == False:
         print(f"Highest Balance = {player_data['highest_balance']}")
         print(f"Times Bankrupt = {player_data['times_bankrupt']}\n")
 
+    #end program
     elif menu_option == 4:
         quitgame = True
 
