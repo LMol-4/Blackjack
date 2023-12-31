@@ -49,14 +49,14 @@ def main_menu():
 
 #settings menu function
 def settings_menu():
-    print("1) Change name\n2) Number Of Decks\n3) Card Count Mode\n4) Debug Mode\n5) Back To Main Menu")
+    print("1) Change name\n2) Number Of Decks\n3) Card Count Mode\n4) Debug Mode\n5) Reset Stats\n6) Back To Main Menu")
     while True:
         user_input = input("\nPlease select an option: ")
 
-        if user_input.isdigit() and int(user_input) in [1, 2, 3, 4, 5]:
+        if user_input.isdigit() and int(user_input) in [1, 2, 3, 4, 5, 6]:
             return int(user_input)
         else:
-            print("Invalid option. Please enter 1, 2, 3, 4 or 5.")
+            print("Invalid option. Please enter 1, 2, 3, 4, 5 or 6.")
 
 #find location of .py function
 def get_script_directory():
@@ -307,8 +307,16 @@ while quitgame == False:
                 if (debug_mode %2 != 0):
                     print("Debug mode is: Enabled")
 
-            #exit settings
             if settings_option == 5:
+                resetstats = input("Type RESET to confirm: ")
+                if resetstats == 'RESET':
+                    print("Your stats have been reset!")
+                    player_data = {'name': 'Player', 'balance': 1000, 'wins': 0, 'games_played': 0, 'highest_balance': 0, 'biggest_win': 0, 'biggest_loss': 0, 'times_bankrupt': 0, 'num_decks': 1}
+                else:
+                    print("You did not reset your stats!")
+
+            #exit settings
+            if settings_option == 6:
                 exit_settings = True
 
     #stats
